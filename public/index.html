@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sistema de Gestão Acadêmica</title>
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <header>
+        <h1>🏫 Sistema de Gestão Acadêmica</h1>
+        <p>Projeto Universidade WEB - Backend Development</p>
+      </header>
+
+      <nav class="tabs">
+        <button class="tab-btn active" data-tab="departamentos">
+          Departamentos
+        </button>
+        <button class="tab-btn" data-tab="cursos">Cursos</button>
+        <button class="tab-btn" data-tab="turmas">Turmas</button>
+        <button class="tab-btn" data-tab="alunos">Alunos</button>
+        <button class="tab-btn" data-tab="matriculas">Matrículas</button>
+        <button class="tab-btn" data-tab="pagamentos">Pagamentos</button>
+      </nav>
+
+      <main>
+        <!-- Tab Departamentos -->
+        <div id="departamentos" class="tab-content active">
+          <div class="section-header">
+            <h2>Gerenciar Departamentos</h2>
+            <button class="btn-primary" onclick="showForm('departamento')">
+              + Novo Departamento
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-departamento"
+              placeholder="Buscar departamento..."
+              onkeyup="filterTable('departamento')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-departamento">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Descrição</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-departamento">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab Cursos -->
+        <div id="cursos" class="tab-content">
+          <div class="section-header">
+            <h2>Gerenciar Cursos</h2>
+            <button class="btn-primary" onclick="showForm('curso')">
+              + Novo Curso
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-curso"
+              placeholder="Buscar curso..."
+              onkeyup="filterTable('curso')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-curso">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Departamento</th>
+                  <th>Descrição</th>
+                  <th>Sigla</th>
+                  <th>Mensalidade</th>
+                  <th>Duração</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-curso">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab Turmas -->
+        <div id="turmas" class="tab-content">
+          <div class="section-header">
+            <h2>Gerenciar Turmas</h2>
+            <button class="btn-primary" onclick="showForm('turma')">
+              + Nova Turma
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-turma"
+              placeholder="Buscar turma..."
+              onkeyup="filterTable('turma')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-turma">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Curso</th>
+                  <th>Semestre</th>
+                  <th>Período</th>
+                  <th>Turno</th>
+                  <th>Sala</th>
+                  <th>Limite</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-turma">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab Alunos -->
+        <div id="alunos" class="tab-content">
+          <div class="section-header">
+            <h2>Gerenciar Alunos</h2>
+            <button class="btn-primary" onclick="showForm('aluno')">
+              + Novo Aluno
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-aluno"
+              placeholder="Buscar aluno..."
+              onkeyup="filterTable('aluno')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-aluno">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nome</th>
+                  <th>Cidade</th>
+                  <th>Estado</th>
+                  <th>Nascimento</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-aluno">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab Matrículas -->
+        <div id="matriculas" class="tab-content">
+          <div class="section-header">
+            <h2>Gerenciar Matrículas</h2>
+            <button class="btn-primary" onclick="showForm('matricula')">
+              + Nova Matrícula
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-matricula"
+              placeholder="Buscar matrícula..."
+              onkeyup="filterTable('matricula')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-matricula">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Aluno</th>
+                  <th>Turma</th>
+                  <th>Data Matrícula</th>
+                  <th>Status</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-matricula">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Tab Pagamentos -->
+        <div id="pagamentos" class="tab-content">
+          <div class="section-header">
+            <h2>Gerenciar Pagamentos</h2>
+            <button class="btn-primary" onclick="showForm('pagamento')">
+              + Novo Pagamento
+            </button>
+          </div>
+
+          <div class="search-bar">
+            <input
+              type="text"
+              id="search-pagamento"
+              placeholder="Buscar pagamento..."
+              onkeyup="filterTable('pagamento')"
+            />
+          </div>
+
+          <div class="table-container">
+            <table id="table-pagamento">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Matrícula</th>
+                  <th>Valor</th>
+                  <th>Tipo</th>
+                  <th>Período</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                  <th>Ações</th>
+                </tr>
+              </thead>
+              <tbody id="tbody-pagamento">
+                <!-- Dados serão carregados via JavaScript -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </main>
+
+      <!-- Modal para formulários -->
+      <div id="modal" class="modal">
+        <div class="modal-content">
+          <span class="close">&times;</span>
+          <div id="modal-body">
+            <!-- Conteúdo do formulário será inserido aqui -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading -->
+      <div id="loading" class="loading hidden">
+        <div class="spinner"></div>
+        <p>Carregando...</p>
+      </div>
+    </div>
+
+    <script src="js/app.js"></script>
+  </body>
+</html>
