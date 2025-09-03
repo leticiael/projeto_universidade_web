@@ -14,7 +14,7 @@ const dbConfig = {
   server: "localhost",
   database: "ProjetoUniversidadeWeb",
   user: "sa",
-  password: "123456", // coloque aqui a senha que você definiu
+  password: "MinhaSenh@123", // coloque aqui a senha que você definiu
   options: {
     encrypt: false, // ou true, se necessário
     trustServerCertificate: true,
@@ -95,6 +95,19 @@ app.put("/api/departamentos/:id", async (req, res) => {
 app.delete("/api/departamentos/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Verificar se há cursos vinculados
+    const cursosVinculados = await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query("SELECT COUNT(*) as total FROM curso WHERE id_departamento = @id");
+    
+    if (cursosVinculados.recordset[0].total > 0) {
+      return res.status(400).json({ 
+        error: "Não é possível excluir o departamento. Há cursos vinculados a ele." 
+      });
+    }
+    
     const result = await pool
       .request()
       .input("id", sql.Int, id)
@@ -194,6 +207,19 @@ app.put("/api/cursos/:id", async (req, res) => {
 app.delete("/api/cursos/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Verificar se há turmas vinculadas
+    const turmasVinculadas = await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query("SELECT COUNT(*) as total FROM turma WHERE id_curso = @id");
+    
+    if (turmasVinculadas.recordset[0].total > 0) {
+      return res.status(400).json({ 
+        error: "Não é possível excluir o curso. Há turmas vinculadas a ele." 
+      });
+    }
+    
     const result = await pool
       .request()
       .input("id", sql.Int, id)
@@ -305,6 +331,19 @@ app.put("/api/turmas/:id", async (req, res) => {
 app.delete("/api/turmas/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Verificar se há matrículas vinculadas
+    const matriculasVinculadas = await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query("SELECT COUNT(*) as total FROM matricula WHERE id_turma = @id");
+    
+    if (matriculasVinculadas.recordset[0].total > 0) {
+      return res.status(400).json({ 
+        error: "Não é possível excluir a turma. Há matrículas vinculadas a ela." 
+      });
+    }
+    
     const result = await pool
       .request()
       .input("id", sql.Int, id)
@@ -337,17 +376,35 @@ app.get("/api/alunos", async (req, res) => {
 app.post("/api/alunos", async (req, res) => {
   try {
     const { nome, cidade, estado, data_nascimento, status } = req.body;
-    const result = await pool
-      .request()
+    
+    // Validar e converter data
+    let dataNascimento = null;
+    if (data_nascimento && data_nascimento.trim() !== '') {
+      dataNascimento = new Date(data_nascimento);
+      // Verificar se a data é válida
+      if (isNaN(dataNascimento.getTime())) {
+        return res.status(400).json({ error: "Data de nascimento inválida" });
+      }
+    }
+    
+    const request = pool.request()
       .input("nome", sql.VarChar, nome)
       .input("cidade", sql.VarChar, cidade)
       .input("estado", sql.VarChar, estado)
-      .input("data_nascimento", sql.Date, data_nascimento)
-      .input("status", sql.VarChar, status).query(`
-                INSERT INTO aluno (nome, cidade, estado, data_nascimento, status) 
-                OUTPUT INSERTED.* 
-                VALUES (@nome, @cidade, @estado, @data_nascimento, @status)
-            `);
+      .input("status", sql.VarChar, status);
+    
+    if (dataNascimento) {
+      request.input("data_nascimento", sql.Date, dataNascimento);
+    } else {
+      request.input("data_nascimento", sql.Date, null);
+    }
+    
+    const result = await request.query(`
+      INSERT INTO aluno (nome, cidade, estado, data_nascimento, status) 
+      OUTPUT INSERTED.* 
+      VALUES (@nome, @cidade, @estado, @data_nascimento, @status)
+    `);
+    
     res.status(201).json(result.recordset[0]);
   } catch (err) {
     console.error("Erro ao criar aluno:", err);
@@ -360,19 +417,36 @@ app.put("/api/alunos/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const { nome, cidade, estado, data_nascimento, status } = req.body;
-    const result = await pool
-      .request()
+    
+    // Validar e converter data
+    let dataNascimento = null;
+    if (data_nascimento && data_nascimento.trim() !== '') {
+      dataNascimento = new Date(data_nascimento);
+      // Verificar se a data é válida
+      if (isNaN(dataNascimento.getTime())) {
+        return res.status(400).json({ error: "Data de nascimento inválida" });
+      }
+    }
+    
+    const request = pool.request()
       .input("id", sql.Int, id)
       .input("nome", sql.VarChar, nome)
       .input("cidade", sql.VarChar, cidade)
       .input("estado", sql.VarChar, estado)
-      .input("data_nascimento", sql.Date, data_nascimento)
-      .input("status", sql.VarChar, status).query(`
-                UPDATE aluno 
-                SET nome = @nome, cidade = @cidade, estado = @estado, data_nascimento = @data_nascimento, status = @status 
-                OUTPUT INSERTED.* 
-                WHERE id_aluno = @id
-            `);
+      .input("status", sql.VarChar, status);
+    
+    if (dataNascimento) {
+      request.input("data_nascimento", sql.Date, dataNascimento);
+    } else {
+      request.input("data_nascimento", sql.Date, null);
+    }
+    
+    const result = await request.query(`
+      UPDATE aluno 
+      SET nome = @nome, cidade = @cidade, estado = @estado, data_nascimento = @data_nascimento, status = @status 
+      OUTPUT INSERTED.* 
+      WHERE id_aluno = @id
+    `);
 
     if (result.recordset.length === 0) {
       return res.status(404).json({ error: "Aluno não encontrado" });
@@ -388,6 +462,25 @@ app.put("/api/alunos/:id", async (req, res) => {
 app.delete("/api/alunos/:id", async (req, res) => {
   try {
     const { id } = req.params;
+    
+    // Primeiro, excluir pagamentos relacionados às matrículas do aluno
+    await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query(`
+        DELETE FROM pagamento 
+        WHERE id_matricula IN (
+          SELECT id_matricula FROM matricula WHERE id_aluno = @id
+        )
+      `);
+    
+    // Depois, excluir matrículas do aluno
+    await pool
+      .request()
+      .input("id", sql.Int, id)
+      .query("DELETE FROM matricula WHERE id_aluno = @id");
+    
+    // Por último, excluir o aluno
     const result = await pool
       .request()
       .input("id", sql.Int, id)
@@ -396,7 +489,7 @@ app.delete("/api/alunos/:id", async (req, res) => {
     if (result.rowsAffected[0] === 0) {
       return res.status(404).json({ error: "Aluno não encontrado" });
     }
-    res.json({ message: "Aluno excluído com sucesso" });
+    res.json({ message: "Aluno e registros relacionados excluídos com sucesso" });
   } catch (err) {
     console.error("Erro ao excluir aluno:", err);
     res.status(500).json({ error: "Erro interno do servidor" });

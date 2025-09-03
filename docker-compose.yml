@@ -1,0 +1,12 @@
+version: '3.8'
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver_universidade
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=MinhaSenh@123
+    ports:
+      - "1433:1433"
+    volumes:
+      - ./projeto_universidade_web.sql:/docker-entrypoint-initdb.d/projeto_universidade_web.sql

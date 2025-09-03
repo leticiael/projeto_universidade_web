@@ -71,7 +71,8 @@ function showForm(entityType, data = null) {
   const form = document.getElementById("entity-form");
   form.addEventListener("submit", (e) => {
     e.preventDefault();
-    handleFormSubmit(entityType, data ? data.id : null);
+    const id = data ? getIdFromData(entityType, data) : null;
+    handleFormSubmit(entityType, id);
   });
 }
 
@@ -286,7 +287,7 @@ function generateFormHTML(entityType, data) {
                     <div class="form-group">
                         <label for="data_nascimento">Data de Nascimento:</label>
                         <input type="date" id="data_nascimento" name="data_nascimento" value="${
-                          data?.data_nascimento || ""
+                          data?.data_nascimento ? new Date(data.data_nascimento).toISOString().split('T')[0] : ""
                         }">
                     </div>
                     <div class="form-group">
@@ -793,6 +794,18 @@ function getEntityName(entityType) {
     pagamento: "Pagamento",
   };
   return names[entityType] || entityType;
+}
+
+function getIdFromData(entityType, data) {
+  const idFields = {
+    departamento: "id_departamento",
+    curso: "id_curso",
+    turma: "id_turma",
+    aluno: "id_aluno",
+    matricula: "id_matricula",
+    pagamento: "id_pagamento",
+  };
+  return data[idFields[entityType]];
 }
 
 function showLoading(show) {
